@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药理学探究式学习智能体</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(145deg, #0f172a 0%, #1a365d 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+        /* 导航栏 */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 181, 216, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00b5d8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo span { font-size: 24px; }
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #00b5d8; }
+        /* Hero 区域 */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .hero h1 .accent { color: #00b5d8; }
+        .hero .subtitle {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+        .hero .desc {
+            font-size: 15px;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .hero .cta-btn {
+            display: inline-block;
+            padding: 14px 36px;
+            background: #00b5d8;
+            color: #fff;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background 0.3s, transform 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .hero .cta-btn:hover {
+            background: #0099b8;
+            transform: scale(1.03);
+        }
+        /* 聊天区容器 */
+        .chat-section {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        .chat-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .chat-header {
+            background: rgba(0,181,216,0.1);
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chat-header .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #00b5d8;
+            box-shadow: 0 0 10px #00b5d8;
+        }
+        .chat-header span {
+            font-size: 16px;
+            color: #00b5d8;
+            font-weight: 500;
+        }
+        #coze-chat {
+            width: 100%;
+            height: 500px;
+        }
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #475569;
+            font-size: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="logo">
+            <span>🧬</span> PharmAgent
+        </div>
+        <div class="nav-links">
+            <a href="#">首页</a>
+            <a href="#">探究工作台</a>
+            <a href="#">知识图谱</a>
+            <a href="#">学习记录</a>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="hero">
+        <h1>药理学<span class="accent">探究式学习</span>智能体</h1>
+        <p class="subtitle">从靶点到临床，模拟真实科研思维</p>
+        <p class="desc">
+            本智能体深度融入《药理学》课程教学目标与专属知识库，
+            通过“靶点发现 → 药物筛选 → 性质预测 → 方案评价”四步探究法，
+            引导你理解药物作用机制与临床应用，所有回答严格依据课程教材。
+        </p>
+        <a href="#chat-section" class="cta-btn">开始探究</a>
+    </section>
+
+    <!-- 聊天区 -->
+    <section class="chat-section" id="chat-section">
+        <div class="chat-card">
+            <div class="chat-header">
+                <div class="dot"></div>
+                <span>药理学智能体 · 课程专属问答</span>
+            </div>
+            <!-- Coze Web Chat 挂载点 -->
+            <div id="coze-chat"></div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        © 2025 药理学课程智能体 · 基于 Coze 知识库与课程教材
+    </div>
+
+    <!-- 引入 Coze Web SDK -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/chat-sdk/chat-sdk.umd.js"></script>
+    <script>
+        // 将智能体设为“公开”后，只需填写 Bot ID，无需 token
+        new window.CozeWebChat({
+            title: '药理学智能体',
+            bot_id: 'YOUR_BOT_ID',          // 替换成你的 Bot ID
+            layout: 'pc',
+            dom: '#coze-chat',
+            // 可选：自定义欢迎语
+            placeholder: '请输入药理学问题，如：卡托普利的作用机制？'
+        });
+    </script>
+</body>
+</html>
