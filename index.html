@@ -2,10 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>药理学探究式学习智能体</title>
-    <!-- 引入 ECharts 用于后续知识图谱扩展，此处一并加载 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -50,34 +48,12 @@
         }
         .chat-header .dot { width: 10px; height: 10px; border-radius: 50%; background: #00b5d8; box-shadow: 0 0 10px #00b5d8; }
         .chat-header span { font-size: 16px; color: #00b5d8; font-weight: 500; }
-        #chat-messages {
-            height: 450px; overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 12px;
+        /* SDK 挂载容器 */
+        #coze-chat {
+            width: 100%;
+            height: 600px;
         }
-        .message {
-            max-width: 85%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 14px;
-            word-break: break-word;
-        }
-        .message.user { align-self: flex-end; background: #00b5d8; color: #fff; }
-        .message.bot { align-self: flex-start; background: rgba(255,255,255,0.08); color: #e2e8f0; }
-        .chat-input-area {
-            display: flex; gap: 10px; padding: 16px 24px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .chat-input-area input {
-            flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08); color: white; font-size: 14px; outline: none;
-        }
-        .chat-input-area button {
-            padding: 12px 24px; background: #00b5d8; color: #fff; border: none;
-            border-radius: 12px; font-weight: 600; cursor: pointer;
-        }
-        .chat-input-area button:disabled { background: #475569; cursor: not-allowed; }
         .footer { text-align: center; padding: 20px; color: #475569; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 28px; }
-            .hero .subtitle { font-size: 16px; }
-        }
     </style>
 </head>
 <body>
@@ -94,133 +70,48 @@
     <section class="hero">
         <h1>药理学<span class="accent">探究式学习</span>智能体</h1>
         <p class="subtitle">从靶点到临床，模拟真实科研思维</p>
-        <p class="desc">本智能体深度融入《药理学》课程教学目标与专属知识库，通过“靶点发现→药物筛选→性质预测→方案评价”四步探究法，引导你理解药物作用机制与临床应用。</p>
+        <p class="desc">
+            本智能体深度融入《药理学》课程教学目标与专属知识库，
+            通过“靶点发现→药物筛选→性质预测→方案评价”四步探究法，
+            引导你理解药物作用机制与临床应用。
+        </p>
         <a href="#chat-section" class="cta-btn">开始探究</a>
     </section>
 
     <section class="chat-section" id="chat-section">
         <div class="chat-card">
-            <div class="chat-header"><div class="dot"></div><span>药理学智能体 · 课程专属问答</span></div>
-            <div id="chat-messages">
-                <div class="message bot">您好！我是药理学探究式学习智能体。请输入您想了解的药理学问题，我们可以从靶点发现开始探究。</div>
+            <div class="chat-header">
+                <div class="dot"></div>
+                <span>药理学智能体 · 课程专属问答</span>
             </div>
-            <div class="chat-input-area">
-                <input id="user-input" type="text" placeholder="例如：卡托普利的作用机制是什么？" />
-                <button id="send-button" onclick="sendMessage()">发送</button>
-            </div>
+            <!-- Coze 聊天窗口挂载点 -->
+            <div id="coze-chat"></div>
         </div>
     </section>
 
-    <div class="footer">© 2025 药理学课程智能体 · 基于 Coze API (V3)</div>
+    <div class="footer">
+        © 2025 药理学课程智能体 · 基于 Coze
+    </div>
 
+    <!-- ========== 官方 SDK 安装代码 ========== -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
     <script>
-        // ========== 👇 配置区域：请替换为你自己的信息 👇 ==========
-        const BOT_ID = '7640289309333143602';        // 你的智能体 Bot ID
-        const API_KEY = 'pat_t68mqFpp99F0dY2Z0lyh7ElDK6YRlVthhpAVLreRmiajaCShDuxB73OwW3jMYjNk';  // 你的 Coze 个人访问令牌
-        const API_URL = 'https://api.coze.cn/v3/chat'; // V3 对话接口
-        // ========== 👆 配置结束 ==========
-
-        const messagesDiv = document.getElementById('chat-messages');
-        const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-
-        // 回车发送
-        userInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            // 1. 添加用户消息
-            addMessage('user', text);
-            userInput.value = '';
-
-            // 2. 锁定界面，防止重复发送
-            sendButton.disabled = true;
-            userInput.disabled = true;
-            const loadingMsg = addMessage('bot', '正在思考中，请稍候...');
-
-            try {
-                // 3. 调用 Coze V3 对话 API（非流式）
-                const requestBody = {
-                    bot_id: BOT_ID,
-                    user_id: 'student_001',
-                    additional_messages: [
-                        { role: 'user', content: text, content_type: 'text' }
-                    ],
-                    auto_save_history: true
-                };
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                // 4. 处理响应
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`API请求失败 (状态码: ${response.status})`, errorText);
-                    throw new Error(`请求失败 (${response.status})`);
+        new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7640289309333143602',
+            },
+            componentProps: {
+                title: '药理学智能体',   // 可以改成你喜欢的标题
+            },
+            auth: {
+                type: 'token',
+                token: 'pat_t68mqFpp99F0dY2Z0lyh7ElDK6YRlVthhpAVLreRmiajaCShDuxB73OwW3jMYjNk',   // 👈 替换成你的真实 token
+                onRefreshToken: function () {
+                    return 'pat_t68mqFpp99F0dY2Z0lyh7ElDK6YRlVthhpAVLreRmiajaCShDuxB73OwW3jMYjNk'  // 👈 同样替换成你的真实 token
                 }
-
-                const data = await response.json();
-                console.log('API完整响应:', JSON.stringify(data, null, 2));
-
-                // 5. 解析 V3 接口返回的消息
-                let botReply = '';
-                if (data && data.data && Array.isArray(data.data.messages)) {
-                    const messages = data.data.messages;
-                    for (const msg of messages) {
-                        if (msg.role === 'assistant') {
-                            botReply = msg.content;
-                            break;
-                        }
-                    }
-                }
-
-                if (!botReply) {
-                    throw new Error('未找到智能体回复');
-                }
-
-                // 6. 更新加载消息为最终回复
-                updateMessage(loadingMsg, botReply);
-
-            } catch (error) {
-                console.error('发送消息失败:', error);
-                let errorText = '网络请求失败，请稍后重试。';
-                if (error.message.includes('401')) {
-                    errorText = 'API Key 无效，请检查个人访问令牌是否正确。';
-                } else if (error.message.includes('404')) {
-                    errorText = 'Bot ID 无效或未发布，请检查智能体是否已发布到 API 渠道。';
-                }
-                updateMessage(loadingMsg, `❌ ${errorText} (错误: ${error.message})`);
-            } finally {
-                // 7. 恢复界面
-                sendButton.disabled = false;
-                userInput.disabled = false;
-                userInput.focus();
             }
-        }
-
-        function addMessage(role, text) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${role}`;
-            msgDiv.textContent = text;
-            messagesDiv.appendChild(msgDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            return msgDiv;
-        }
-
-        function updateMessage(msgDiv, text) {
-            msgDiv.textContent = text;
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
+        });
     </script>
+    <!-- ========== SDK 代码结束 ========== -->
 </body>
 </html>
