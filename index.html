@@ -104,10 +104,10 @@
     <div class="footer">© 2025 药理学课程智能体 · 基于 Coze API</div>
 
     <script>
-        // ========== 配置区域：替换成你自己的 ==========
+        // ========== 配置区域：确认你的信息正确 ==========
         const BOT_ID = '7640289309333143602';   // 你的 Bot ID
         const API_KEY = 'pat_U5jyh0oN14sknm0xUrKlfx0grXv81AUsxcMxckuFrfwGG1SM7gUlP3c3LBPURy0A';    // 你的个人访问令牌
-        const API_URL = 'https://api.coze.cn/open_api/v2/chat';
+        const API_URL = 'https://api.coze.cn/v3/chat'; // 新版正确接口
         // =============================================
 
         const messagesDiv = document.getElementById('chat-messages');
@@ -134,15 +134,17 @@
                         bot_id: BOT_ID,
                         user_id: 'student_001',
                         stream: false,
-                        additional_messages: [
+                        messages: [
                             { role: 'user', content: text, content_type: 'text' }
                         ]
                     })
                 });
                 const data = await res.json();
-                const reply = data?.messages?.[0]?.content || '抱歉，没有收到回复。';
+                // 新版接口返回格式处理
+                const reply = data?.messages?.find(m => m.role === 'assistant')?.content || '抱歉，没有收到回复。';
                 updateMessage(loadingId, reply);
             } catch (err) {
+                console.error(err);
                 updateMessage(loadingId, '网络错误，请稍后再试。');
             }
         }
